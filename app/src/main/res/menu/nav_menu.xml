@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+
+
+        <item android:id="@+id/nav_call"
+            android:title="test"/>
+
+        <item android:id="@+id/nav_call1"
+            android:title="test"/>
+        <item android:id="@+id/nav_call2"
+            android:title="test"/>
+        <item android:id="@+id/nav_call3"
+            android:title="test"/>
+        <item android:id="@+id/nav_call4"
+            android:title="test"/>
+        <item android:id="@+id/nav_call5"
+            android:title="test"/>
+        <item android:id="@+id/nav_call6"
+            android:title="test"/>
+    </group>
+
+</menu>
