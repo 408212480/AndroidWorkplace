@@ -1,5 +1,6 @@
 package qunincey.com.smartcity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -10,6 +11,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -25,7 +27,11 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -64,14 +70,18 @@ public class MainActivity extends AppCompatActivity {
 
     private NewsMenu newsMenu;
 
+    private static List<Fragment> mFragmentHashMap=new ArrayList<>();
+
+    private static final List<String> classifiedNesTitleString= Arrays.asList("首页","新闻","政务","服务","设置");
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        viewPager = (ViewPager) findViewById(R.id.viewPager);
+        viewPager =  findViewById(R.id.viewPager);
 
-        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+
 
         navigationView = findViewById(R.id.nav_view);
 
@@ -84,9 +94,13 @@ public class MainActivity extends AppCompatActivity {
 
         drawerLayout = findViewById(R.id.dl_content);
 
+        initView();
+        tabLayout =  findViewById(R.id.tabLayout);
+
         viewPager.setAdapter(new PageAdapter(getSupportFragmentManager(),tabLayout.getTabCount()));
 
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -104,7 +118,13 @@ public class MainActivity extends AppCompatActivity {
                             System.out.println("发现缓存啦");
                             newsMenu=processData(cache);
                         }
+                        /*
+                        * 滑动到这一页再去填充数据
+                        * */
                         getDataFromServer();
+                        /*
+                        * 监听
+                        * */
                         listinit(newsMenu);
                         break;
                     case 2:
@@ -151,7 +171,41 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+
+
+
+    }
+
+    private void initView() {
+        Fragment fragment1=new FragmentHome();
+        Fragment fragment2=new FragmentNews();
+
+        /*
+        * bundle传参
+        *
+        * */
+        Bundle bundle=new Bundle();
+        String cache= CacheUtils.getCache(GlobalConstants.CATEGORY_URL,MainActivity.this);
+        if (cache!=null){
+            System.out.println("发现缓存啦");
+            newsMenu=processData(cache);
+        }
+        bundle.putSerializable("news_menu",newsMenu.data.get(0));
+        fragment2.setArguments(bundle);
+
+        Fragment fragment3=new FragmentGov();
+        Fragment fragment4=new FragmentSmart();
+        Fragment fragment5=new FragmentSetting();
+
+        mFragmentHashMap.add(0,fragment1);
+        mFragmentHashMap.add(1,fragment2);
+        mFragmentHashMap.add(2,fragment3);
+        mFragmentHashMap.add(3,fragment4);
+        mFragmentHashMap.add(4,fragment5);
+
+        Log.i("i","填充成功");
+
+
 
     }
 
@@ -164,9 +218,11 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 drawerLayout.closeDrawer(Gravity.LEFT);
                 switch (position){
-                    case 0:
+                    case 1:
                         Toast.makeText(MainActivity.this,"item1",Toast.LENGTH_SHORT).show();
-//                        setDefaultFragment();
+                        Fragment fragment2=new FragmentHome();
+                        mFragmentHashMap.set(1,fragment2);
+                        viewPager.setAdapter(new PageAdapter(getSupportFragmentManager(),tabLayout.getTabCount()));
                 }
 
             }
@@ -200,7 +256,6 @@ public class MainActivity extends AppCompatActivity {
                     String responseStr = response.body().string();
                     newsMenu=processData(responseStr);
                     CacheUtils.setCache(GlobalConstants.CATEGORY_URL,responseStr,MainActivity.this);
-                    // Do what you want to do with the response.
                 } else {
                     Toast.makeText(MainActivity.this,"服务器错误",Toast.LENGTH_SHORT).show();
                 }
@@ -218,12 +273,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public class PageAdapter extends FragmentPagerAdapter{
+    public class PageAdapter extends FragmentStatePagerAdapter {
 
         private int num;
-
-        private HashMap<Integer, Fragment> mFragmentHashMap = new HashMap<>();
-
 
 
         public PageAdapter(FragmentManager fm,int num) {
@@ -274,7 +326,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                 }
-                mFragmentHashMap.put(pos,fragment);
+                mFragmentHashMap.add(pos,fragment);
             }
             return fragment;
         }

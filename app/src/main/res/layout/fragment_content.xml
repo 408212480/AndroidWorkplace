@@ -1,107 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:id="@+id/dl_content"
-    >
+    android:layout_height="match_parent">
 
-    <android.support.constraint.ConstraintLayout
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
 
-        <android.support.design.widget.TabLayout
-            android:id="@+id/tabLayout"
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/bottom_tab_bg"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/viewpager"
-            app:layout_constraintVertical_bias="1.0"
-            app:tabMode="fixed"
-            app:tabBackground="@drawable/bottom_tab_bg"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@drawable/title_red_bg"
+            app:popupTheme="@style/AppTheme.PopupOverlay"
             >
-
-            <android.support.design.widget.TabItem
-                android:id="@+id/ti_home"
+            <TextView
+                android:id="@+id/tv_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textColor="#fff"
                 android:text="首页"
-                android:icon="@drawable/ti_home_selector"
+                android:textSize="22sp"
                 />
 
-            <android.support.design.widget.TabItem
-                android:id="@+id/ti_news"
+            <ImageButton
+                android:id="@+id/btn_menu"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="新闻中心"
-                android:icon="@drawable/ti_news_selector"
+                android:background="@null"
+                android:src="@drawable/img_menu"
                 />
 
-            <android.support.design.widget.TabItem
-                android:id="@+id/ti_smart"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="智慧服务"
-                android:icon="@drawable/ti_smart_selector"
-                />
+        </android.support.v7.widget.Toolbar>
 
-            <android.support.design.widget.TabItem
-                android:id="@+id/ti_gov"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="政务"
-                android:icon="@drawable/ti_gov_selector"
-
-                />
-
-            <android.support.design.widget.TabItem
-                android:id="@+id/ti_setting"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="设置"
-                android:icon="@drawable/ti_setting_selector"
-                />
-        </android.support.design.widget.TabLayout>
-
-        <android.support.v4.view.ViewPager
-            android:id="@+id/viewPager"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
-    </android.support.constraint.ConstraintLayout>
-
-
-    <android.support.design.widget.NavigationView
-        android:id="@+id/nav_view"
+    </android.support.design.widget.AppBarLayout>
+    <TextView
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:fitsSystemWindows="true"
-        >
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:background="#000"
-            >
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="我是2页面"
+        />
 
-            <ListView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:id="@+id/lv_nv"
-                android:layout_marginTop="80dp"
-                >
-
-            </ListView>
-
-        </LinearLayout>
-
-    </android.support.design.widget.NavigationView>
-
-
-</android.support.v4.widget.DrawerLayout>
+</RelativeLayout>

@@ -1,8 +1,9 @@
 package qunincey.com.smartcity.domain;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class NewsMenu {
+public class NewsMenu implements  Serializable{
 
     public int retcode;
 
@@ -18,7 +19,7 @@ public class NewsMenu {
         this.data = data;
     }
 
-    public class NewsMenuData{
+    public class NewsMenuData implements Serializable {
         public int id;
         public String title;
         public int type;
@@ -49,6 +50,14 @@ public class NewsMenu {
         @Override
         public String toString() {
             return this.title;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public void setTitle(String title) {
+            this.title = title;
         }
     }
 
