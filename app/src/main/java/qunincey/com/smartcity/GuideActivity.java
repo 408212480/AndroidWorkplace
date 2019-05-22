@@ -31,7 +31,7 @@ public class GuideActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guide);
-        viewPager=(ViewPager)findViewById(R.id.vp_guide);
+        viewPager=findViewById(R.id.vp_guide);
         circleIndicator=findViewById(R.id.indicator);
         btnStart = findViewById(R.id.btn_start);
         initData();

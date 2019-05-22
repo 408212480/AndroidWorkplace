@@ -79,6 +79,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
+
         viewPager =  findViewById(R.id.viewPager);
 
 
@@ -115,16 +118,9 @@ public class MainActivity extends AppCompatActivity {
                         tabLayout.getTabAt(1).setIcon(R.drawable.newscenter_press);
                         String cache= CacheUtils.getCache(GlobalConstants.CATEGORY_URL,MainActivity.this);
                         if (cache!=null){
-                            System.out.println("发现缓存啦");
                             newsMenu=processData(cache);
                         }
-                        /*
-                        * 滑动到这一页再去填充数据
-                        * */
                         getDataFromServer();
-                        /*
-                        * 监听
-                        * */
                         listinit(newsMenu);
                         break;
                     case 2:
@@ -189,10 +185,10 @@ public class MainActivity extends AppCompatActivity {
         if (cache!=null){
             System.out.println("发现缓存啦");
             newsMenu=processData(cache);
+            bundle.putSerializable("news_menu",newsMenu.data.get(0));
+            fragment2.setArguments(bundle);
         }
-        bundle.putSerializable("news_menu",newsMenu.data.get(0));
-        fragment2.setArguments(bundle);
-
+        getDataFromServer();
         Fragment fragment3=new FragmentGov();
         Fragment fragment4=new FragmentSmart();
         Fragment fragment5=new FragmentSetting();
@@ -212,7 +208,6 @@ public class MainActivity extends AppCompatActivity {
     private void listinit(NewsMenu newsMenu) {
         TitleAdpater titleAdpater=new TitleAdpater(newsMenu,MainActivity.this);
         listView.setAdapter(titleAdpater);
-
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -229,13 +224,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-//    private void setDefaultFragment() {
-//        FragmentManager fm = getSupportFragmentManager();
-//        FragmentTransaction transaction = fm.beginTransaction();
-//        FragmentGov gov = new FragmentGov();
-//        transaction.replace(R.id.fl_main, gov);
-//        transaction.commit();
-//    }
+
 
     public void getDataFromServer(){
 
@@ -243,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
          * 主线程不能开网络请求  会阻塞  用异步的
          *
          * */
-        OkhttpUtils.sendRequestWithOkhttp("http://10.0.2.2:8080/zhbj/categories.json", new Callback() {
+        OkhttpUtils.sendRequestWithOkhttp(GlobalConstants.SERVER_URL+"/categories.json", new Callback() {
 
             @Override
             public void onFailure(Call call, IOException e) {
@@ -254,10 +243,11 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
                     String responseStr = response.body().string();
+                    System.out.println(responseStr);
                     newsMenu=processData(responseStr);
                     CacheUtils.setCache(GlobalConstants.CATEGORY_URL,responseStr,MainActivity.this);
                 } else {
-                    Toast.makeText(MainActivity.this,"服务器错误",Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(MainActivity.this,"服务器错误",Toast.LENGTH_SHORT).show();
                 }
             }
         });

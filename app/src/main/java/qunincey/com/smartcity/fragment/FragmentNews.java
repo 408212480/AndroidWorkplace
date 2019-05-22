@@ -8,6 +8,7 @@ import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
@@ -38,9 +39,10 @@ public class FragmentNews extends Fragment {
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
     private NewsMenu.NewsMenuData newsMenuDataArrayList;
-    private List<FragmentInfo> mFragments;
+    private List<FragmentNewsMenuDetail> mFragments;
     private TabLayout tabLayout;
     private ViewPager viewPager;
+
 
 
     @Nullable
@@ -49,25 +51,53 @@ public class FragmentNews extends Fragment {
 
         view = inflater.inflate(R.layout.fragment_content2,container,false);
         Bundle bundle = getArguments();
-        newsMenuDataArrayList = (NewsMenu.NewsMenuData) bundle.getSerializable("news_menu");
-        viewPager = view.findViewById(R.id.viewPager);
-        tabLayout = view.findViewById(R.id.tab_layout);
-        initFragments();
-        PagerAdapter adapter = new
-                ViewPagerAdapter(getFragmentManager(),initFragments());
-        viewPager.setAdapter(adapter);
-        tabLayout.setupWithViewPager(viewPager);
+        if (bundle!=null && bundle.containsKey("news")){
+            newsMenuDataArrayList = (NewsMenu.NewsMenuData) bundle.getSerializable("news_menu");
+            initView();
+        }
         return view;
     }
 
-    private List<FragmentInfo> initFragments() {
-        mFragments = new ArrayList<>(4);
+    public void initView(){
+
+        viewPager = view.findViewById(R.id.viewPager);
+        tabLayout = view.findViewById(R.id.tab_layout);
+        mFragments = new ArrayList<>();
+
 
         for (int i=0;i<newsMenuDataArrayList.children.size();i++){
-            FragmentInfo fragmentInfo=new FragmentInfo(newsMenuDataArrayList.children.get(i).getTitle(),FragmentNewsMenuDetail.class);
+            FragmentNewsMenuDetail fragmentInfo=new FragmentNewsMenuDetail();
+            Bundle bundle1 =new Bundle();
+            bundle1.putSerializable(i+"",newsMenuDataArrayList.getChildren().get(i));
+            bundle1.putInt("id",i);
+            fragmentInfo.setArguments(bundle1);
+
             mFragments.add(fragmentInfo);
+            tabLayout.addTab(tabLayout.newTab().setText(newsMenuDataArrayList.children.get(i).title));
         }
-        return mFragments;
+        PagerAdapter adapter = new
+                ViewPagerAdapter(getChildFragmentManager());
+        viewPager.setAdapter(adapter);
+
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
     }
 
     @Override
@@ -84,33 +114,16 @@ public class FragmentNews extends Fragment {
     }
 
 
-    public class ViewPagerAdapter extends FragmentStatePagerAdapter {
+    public class ViewPagerAdapter extends FragmentPagerAdapter {
 
-        private List<FragmentInfo> mFragments;
 
-        public ViewPagerAdapter(FragmentManager fm, List<FragmentInfo> fragments) {
+        public ViewPagerAdapter(FragmentManager fm) {
             super(fm);
-
-            mFragments = fragments;
         }
 
         @Override
         public Fragment getItem(int position) {
-
-
-            try {
-                return (Fragment) mFragments.get(position).getFragment().newInstance();
-
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (java.lang.InstantiationException e) {
-                e.printStackTrace();
-            }
-
-            return  null;
-
+            return  mFragments.get(position);
         }
 
         @Override
@@ -121,7 +134,9 @@ public class FragmentNews extends Fragment {
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return mFragments.get(position).getTitle();
+            return newsMenuDataArrayList.children.get(position).title;
         }
     }
+
+
 }

@@ -10,7 +10,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
+import android.widget.Toast;
 
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
+import qunincey.com.smartcity.global.GlobalConstants;
+import qunincey.com.smartcity.utils.CacheUtils;
+import qunincey.com.smartcity.utils.OkhttpUtils;
 import qunincey.com.smartcity.utils.PrefUtils;
 
 public class SplashActivity extends AppCompatActivity {
@@ -72,11 +81,7 @@ public class SplashActivity extends AppCompatActivity {
 
             }
         });
-
-
-
-        
-
-        
     }
+
+
 }

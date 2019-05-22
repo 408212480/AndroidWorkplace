@@ -23,8 +23,31 @@ public class NewsMenu implements  Serializable{
         public int id;
         public String title;
         public int type;
-
         public ArrayList<NewsTabData> children;
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+
+        public int getType() {
+            return type;
+        }
+
+        public void setType(int type) {
+            this.type = type;
+        }
+
+        public ArrayList<NewsTabData> getChildren() {
+            return children;
+        }
+
+        public void setChildren(ArrayList<NewsTabData> children) {
+            this.children = children;
+        }
 
         public String getTitle() {
             return title;
@@ -40,12 +63,35 @@ public class NewsMenu implements  Serializable{
         }
     }
 
-    public class NewsTabData{
+    public class NewsTabData implements Serializable{
         public int id;
         public String title;
         public int type;
         public String url;
 
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+
+        public int getType() {
+            return type;
+        }
+
+        public void setType(int type) {
+            this.type = type;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
 
         @Override
         public String toString() {
