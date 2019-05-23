@@ -78,14 +78,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
-
-
         viewPager =  findViewById(R.id.viewPager);
-
-
-
         navigationView = findViewById(R.id.nav_view);
 
         tihome = findViewById(R.id.ti_home);

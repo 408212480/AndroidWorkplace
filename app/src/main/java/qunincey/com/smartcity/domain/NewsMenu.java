@@ -93,9 +93,9 @@ public class NewsMenu implements  Serializable{
             this.url = url;
         }
 
-        @Override
+
         public String toString() {
-            return this.title;
+            return this.title+this.getUrl()+this.getType()+"传递成功";
         }
 
         public String getTitle() {

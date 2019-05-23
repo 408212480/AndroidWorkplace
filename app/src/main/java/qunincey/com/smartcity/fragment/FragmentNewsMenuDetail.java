@@ -1,6 +1,7 @@
 package qunincey.com.smartcity.fragment;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -23,6 +24,8 @@ import java.util.ArrayList;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.Response;
 import qunincey.com.smartcity.MainActivity;
 import qunincey.com.smartcity.R;
@@ -31,6 +34,7 @@ import qunincey.com.smartcity.domain.NewsMenu;
 import qunincey.com.smartcity.domain.NewsTabBean;
 import qunincey.com.smartcity.global.GlobalConstants;
 import qunincey.com.smartcity.utils.CacheUtils;
+import qunincey.com.smartcity.utils.MyBitmapUtils;
 import qunincey.com.smartcity.utils.OkhttpUtils;
 
 public class FragmentNewsMenuDetail extends Fragment {
@@ -42,50 +46,71 @@ public class FragmentNewsMenuDetail extends Fragment {
 
 
     private View view;
-    private String title;
-    private TextView textView;
-
-    private ArrayList<NewsMenu.NewsTabData> arrayList;
 
     private NewsMenu.NewsTabData menu;
     private int bundleInt;
-    private String url;
     private Bundle bundle;
     private ViewPager viewPager;
     private NewsTabBean newsTabBean;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        bundle = getArguments();
+        bundleInt = bundle.getInt("id");
+        System.out.println("id"+bundleInt);
+        menu = (NewsMenu.NewsTabData) bundle.getSerializable(bundleInt+"");
+        if (menu !=null){
+            String cache= CacheUtils.getCache(menu.getUrl(),getActivity());
+            if (cache!=null){
+                newsTabBean=processNewsData(cache);
+            }
+        }else {
+            System.out.println("空了");
+        }
+        getDataFromServer();
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_menu_detail,container,false);
-        viewPager = view.findViewById(R.id.view_pager);
-        bundle = getArguments();
-        initImageData();
-        initData();
-        getDataFromServer();
+
         return view;
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        viewPager = view.findViewById(R.id.view_pager);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        initImageData();
+        initData();
+
+    }
+
     private void initData() {
-        bundleInt = bundle.getInt("id");
-        menu = (NewsMenu.NewsTabData) bundle.get(bundleInt+"");
-        url = menu.getUrl();
         viewPager.setAdapter(new imageAdpter());
-
-
     }
     /*初始化view*/
     private void initImageData(){
+
+        MyBitmapUtils myBitmapUtils=new MyBitmapUtils();
         imageViewsList=new ArrayList<>();
-        for (int i=0;i<mImagesIds.length;i++){
+        for (int i=0;i<newsTabBean.data.topnews.size();i++){
             ImageView view=new ImageView(getActivity());
-            view.setBackgroundResource(mImagesIds[i]);
+            view.setScaleType(ImageView.ScaleType.FIT_XY);
             /*维护view*/
+            myBitmapUtils.display(view,newsTabBean.getData().getTopnews().get(i).topimage);
             imageViewsList.add(view);
         }
 
     }
+
 
 
     public void getDataFromServer() {
@@ -94,7 +119,19 @@ public class FragmentNewsMenuDetail extends Fragment {
          * 主线程不能开网络请求  会阻塞  用异步的
          *
          * */
-        OkhttpUtils.sendRequestWithOkhttp(GlobalConstants.SERVER_URL+url, new Callback() {
+
+//        OkHttpClient client = new OkHttpClient();
+//        Request request=new Request.Builder().get().url(GlobalConstants.SERVER_URL+menu.getUrl()).build();
+//
+//        Call call = client.newCall(request);
+//        try {
+//            Response response=call.execute();
+//            String responseStr = response.body().string();
+//            newsTabBean = processNewsData(responseStr);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        OkhttpUtils.sendRequestWithOkhttp(GlobalConstants.SERVER_URL+menu.getUrl(), new Callback() {
 
             @Override
             public void onFailure(Call call, IOException e) {
@@ -104,10 +141,13 @@ public class FragmentNewsMenuDetail extends Fragment {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
+
                     String responseStr = response.body().string();
                     newsTabBean = processNewsData(responseStr);
+                    CacheUtils.setCache(menu.getUrl(),responseStr,getActivity());
+                    System.out.println(GlobalConstants.SERVER_URL+menu.getUrl()+"缓存成功");
                 } else {
-                    Toast.makeText(getActivity(), "服务器错误", Toast.LENGTH_SHORT).show();
+                    System.out.println(GlobalConstants.SERVER_URL+menu.getUrl());
                 }
             }
         });
@@ -117,8 +157,7 @@ public class FragmentNewsMenuDetail extends Fragment {
     private NewsTabBean processNewsData(String responseStr) {
 
         Gson gson=new Gson();
-        NewsTabBean newsTabBean=gson.fromJson(responseStr, NewsTabBean.class);
-        return newsTabBean;
+        return gson.fromJson(responseStr, NewsTabBean.class);
     }
 
     class imageAdpter extends PagerAdapter{

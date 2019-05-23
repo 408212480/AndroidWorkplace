@@ -31,6 +31,7 @@ import okhttp3.Response;
 import qunincey.com.smartcity.R;
 import qunincey.com.smartcity.domain.FragmentInfo;
 import qunincey.com.smartcity.domain.NewsMenu;
+import qunincey.com.smartcity.view.TopNewsViewPager;
 
 public class FragmentNews extends Fragment {
 
@@ -41,7 +42,7 @@ public class FragmentNews extends Fragment {
     private NewsMenu.NewsMenuData newsMenuDataArrayList;
     private List<FragmentNewsMenuDetail> mFragments;
     private TabLayout tabLayout;
-    private ViewPager viewPager;
+    private TopNewsViewPager viewPager;
 
 
 
@@ -51,10 +52,8 @@ public class FragmentNews extends Fragment {
 
         view = inflater.inflate(R.layout.fragment_content2,container,false);
         Bundle bundle = getArguments();
-        if (bundle!=null && bundle.containsKey("news")){
-            newsMenuDataArrayList = (NewsMenu.NewsMenuData) bundle.getSerializable("news_menu");
-            initView();
-        }
+        newsMenuDataArrayList = (NewsMenu.NewsMenuData) bundle.getSerializable("news_menu");
+        initView();
         return view;
     }
 
@@ -68,10 +67,13 @@ public class FragmentNews extends Fragment {
         for (int i=0;i<newsMenuDataArrayList.children.size();i++){
             FragmentNewsMenuDetail fragmentInfo=new FragmentNewsMenuDetail();
             Bundle bundle1 =new Bundle();
-            bundle1.putSerializable(i+"",newsMenuDataArrayList.getChildren().get(i));
-            bundle1.putInt("id",i);
+            /*
+            * 放id
+            * */
+            bundle1.putInt("id",newsMenuDataArrayList.getChildren().get(i).getId());
+            bundle1.putSerializable(newsMenuDataArrayList.getChildren().get(i).getId()+"",newsMenuDataArrayList.getChildren().get(i));
             fragmentInfo.setArguments(bundle1);
-
+            System.out.println(newsMenuDataArrayList.getChildren().get(i).toString());
             mFragments.add(fragmentInfo);
             tabLayout.addTab(tabLayout.newTab().setText(newsMenuDataArrayList.children.get(i).title));
         }
