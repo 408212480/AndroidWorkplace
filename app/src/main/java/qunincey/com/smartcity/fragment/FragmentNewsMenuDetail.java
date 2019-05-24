@@ -2,13 +2,18 @@ package qunincey.com.smartcity.fragment;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.ContentLoadingProgressBar;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -41,6 +46,7 @@ import qunincey.com.smartcity.utils.CacheUtils;
 import qunincey.com.smartcity.utils.MyBitmapUtils;
 import qunincey.com.smartcity.utils.OkhttpUtils;
 import qunincey.com.smartcity.utils.SpacesItemDecoration;
+import qunincey.com.smartcity.utils.onLoadMoreListener;
 
 public class FragmentNewsMenuDetail extends Fragment {
 
@@ -61,13 +67,15 @@ public class FragmentNewsMenuDetail extends Fragment {
     private CirclePageIndicator circleIndicator;
     private RecyclerView recyclerView;
     private MyBitmapUtils myBitmapUtils;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private LinearLayoutManager linearLayoutManager;
+    private Handler handler;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         bundle = getArguments();
         bundleInt = bundle.getInt("id");
-        System.out.println("id"+bundleInt);
         menu = (NewsMenu.NewsTabData) bundle.getSerializable(bundleInt+"");
         if (menu !=null){
             String cache= CacheUtils.getCache(menu.getUrl(),getActivity());
@@ -90,55 +98,53 @@ public class FragmentNewsMenuDetail extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        handler = new Handler();
         myBitmapUtils = new MyBitmapUtils();
-        viewPager = view.findViewById(R.id.view_pager);
 
-        textView = view.findViewById(R.id.tv_topnews);
-        circleIndicator = view.findViewById(R.id.indicator);
         recyclerView = view.findViewById(R.id.rv_list);
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        /*
+         * 指定布局方式  recycview有多种布局方式
+         * */
+        linearLayoutManager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(linearLayoutManager);
+        NewsApdatar newsApdatar=new NewsApdatar(newsTabBean.getData().news);
+        recyclerView.setAdapter(newsApdatar);
+        swipeRefreshLayout = view.findViewById(R.id.swipeLayout);
+        swipeRefreshLayout.setColorSchemeColors(Color.GREEN);
+
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        swipeRefreshLayout.setProgressBackgroundColorSchemeResource(android.R.color.white);
+
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onPageScrolled(int i, float v, int i1) {
-
-            }
-
-            @Override
-            public void onPageSelected(int i) {
-                textView.setText(newsTabBean.getData().topnews.get(i).title);
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int i) {
-
+            public void onRefresh() {
+                System.out.println("耗时操作");
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
 
-        textView.setText(newsTabBean.getData().topnews.get(0).title);
+        recyclerView.addOnScrollListener(new onLoadMoreListener(){
 
-        /*
-        * 指定布局方式  recycview有多种布局方式
-        * */
-        LinearLayoutManager linearLayoutManager=new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(linearLayoutManager);
-
-        NewsApdatar newsApdatar=new NewsApdatar(newsTabBean.getData().news);
-        recyclerView.setAdapter(newsApdatar);
-
+            @Override
+            protected void onLoading(int countItem, int lastItem) {
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.d("i", "run: ");
+                    }
+                },3000);
+            }
+        });
     }
 
     @Override
     public void onStart() {
         super.onStart();
         initImageData();
-        initData();
-
     }
 
-    private void initData() {
-        viewPager.setAdapter(new imageAdpter());
-        circleIndicator.setViewPager(viewPager);
-        circleIndicator.setSnap(true);
-    }
     /*初始化view*/
     private void initImageData(){
 
@@ -193,6 +199,8 @@ public class FragmentNewsMenuDetail extends Fragment {
 
     class imageAdpter extends PagerAdapter{
 
+
+
         /*item总的个数*/
         @Override
         public int getCount() {
@@ -218,7 +226,17 @@ public class FragmentNewsMenuDetail extends Fragment {
         }
     }
 
-    public  class NewsApdatar extends RecyclerView.Adapter<NewsApdatar.ViewHolder> {
+    public  class NewsApdatar extends RecyclerView.Adapter {
+
+
+        public static final int TYPE_HEADER = 0;  //说明是带有Header的
+        public static final int TYPE_FOOTER = 1;  //说明是带有Footer的
+        public static final int TYPE_NORMAL = 2;  //说明是不带有header和footer的
+        private int mHeaderCount=1;//头部View个数
+        private int mBottomCount=1;//底部View个数
+
+        public View headerView;
+        public View footView;
 
         ArrayList<NewsTabBean.NewsData> dataArrayList;
 
@@ -226,12 +244,120 @@ public class FragmentNewsMenuDetail extends Fragment {
             this.dataArrayList=newsData;
         }
 
-        class ViewHolder extends RecyclerView.ViewHolder{
+
+
+
+        @NonNull
+        @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+
+            if (i==TYPE_HEADER){
+                View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_item_header,viewGroup,false);
+                return new HeadHolder(view);
+            }else if (i==TYPE_FOOTER){
+                View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_item_footer,viewGroup,false);
+                return new FoodHolder(view);
+            }else {
+                View view=LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_item_news,viewGroup,false);
+                NewsHolder viewHolder=new NewsHolder(view);
+                return viewHolder;
+            }
+
+
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+
+            if (i==0){
+                viewPager.setAdapter(new imageAdpter());
+                circleIndicator.setViewPager(viewPager);
+                circleIndicator.setSnap(true);
+                viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                    @Override
+                    public void onPageScrolled(int i, float v, int i1) {
+
+                    }
+
+                    @Override
+                    public void onPageSelected(int i) {
+                        textView.setText(newsTabBean.getData().topnews.get(i).title);
+                    }
+
+                    @Override
+                    public void onPageScrollStateChanged(int i) {
+
+                    }
+                });
+
+                textView.setText(newsTabBean.getData().topnews.get(0).title);
+
+            }else if(i == getItemCount()-1){
+
+            }else {
+                NewsTabBean.NewsData newsData=dataArrayList.get(i);
+                NewsHolder newsHolder = (NewsHolder)viewHolder;
+                myBitmapUtils.display(newsHolder.imageView,newsData.listimage);
+                newsHolder.textView.setText(newsData.title);
+                newsHolder.tv_data.setText(newsData.pubdate);
+            }
+
+            linearLayoutManager.getChildCount();
+            linearLayoutManager.getItemCount();
+            linearLayoutManager.findLastVisibleItemPosition();
+
+
+
+
+        }
+
+
+        @Override
+        public int getItemCount() {
+            return dataArrayList.size();
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            if (headerView!=null && footView!=null){
+                return TYPE_NORMAL;
+            }
+            if (position==0){
+                return TYPE_HEADER;
+            }
+            if (position==getItemCount()-1){
+                return TYPE_FOOTER;
+            }
+            return TYPE_NORMAL;
+        }
+
+        class HeadHolder extends RecyclerView.ViewHolder{
+
+            public HeadHolder(@NonNull View itemView) {
+                super(itemView);
+                viewPager = itemView.findViewById(R.id.view_pager);
+                textView = itemView.findViewById(R.id.tv_topnews);
+                circleIndicator = itemView.findViewById(R.id.indicator);
+                recyclerView = itemView.findViewById(R.id.rv_list);
+            }
+        }
+
+        class FoodHolder extends RecyclerView.ViewHolder{
+
+            private final ContentLoadingProgressBar contentLoadingProgressBar;
+
+            public FoodHolder(@NonNull View itemView) {
+                super(itemView);
+                contentLoadingProgressBar = itemView.findViewById(R.id.pb_progress);
+            }
+        }
+
+        class NewsHolder  extends RecyclerView.ViewHolder{
             private  ImageView imageView;
             private final TextView textView;
             private final TextView tv_data;
 
-            public ViewHolder(@NonNull View itemView) {
+            public NewsHolder (@NonNull View itemView) {
                 super(itemView);
                 imageView = itemView.findViewById(R.id.iv_icon);
                 textView = itemView.findViewById(R.id.tv_title);
@@ -240,27 +366,10 @@ public class FragmentNewsMenuDetail extends Fragment {
         }
 
 
-        @NonNull
-        @Override
-        public NewsApdatar.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-
-            View view=LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_item_news,viewGroup,false);
-            ViewHolder viewHolder=new ViewHolder(view);
-            return viewHolder;
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
-            NewsTabBean.NewsData newsData=dataArrayList.get(i);
-            myBitmapUtils.display(viewHolder.imageView,newsData.listimage);
-            viewHolder.textView.setText(newsData.title);
-            viewHolder.tv_data.setText(newsData.pubdate);
-        }
-
-
-        @Override
-        public int getItemCount() {
-            return dataArrayList.size();
-        }
     }
+
+
+
+
+
 }
