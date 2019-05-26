@@ -1,6 +1,7 @@
 package qunincey.com.smartcity.fragment;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -17,7 +18,9 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -37,6 +40,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import qunincey.com.smartcity.MainActivity;
+import qunincey.com.smartcity.NewsDetailActivity;
 import qunincey.com.smartcity.R;
 import qunincey.com.smartcity.base.impl.menu.TabDetailPager;
 import qunincey.com.smartcity.domain.NewsMenu;
@@ -45,6 +49,8 @@ import qunincey.com.smartcity.global.GlobalConstants;
 import qunincey.com.smartcity.utils.CacheUtils;
 import qunincey.com.smartcity.utils.MyBitmapUtils;
 import qunincey.com.smartcity.utils.OkhttpUtils;
+import qunincey.com.smartcity.utils.OnItemTouchListener;
+import qunincey.com.smartcity.utils.PrefUtils;
 import qunincey.com.smartcity.utils.SpacesItemDecoration;
 import qunincey.com.smartcity.utils.onLoadMoreListener;
 
@@ -70,6 +76,7 @@ public class FragmentNewsMenuDetail extends Fragment {
     private SwipeRefreshLayout swipeRefreshLayout;
     private LinearLayoutManager linearLayoutManager;
     private Handler handler;
+    private ArrayList<NewsTabBean.NewsData> arrayNewsList;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -86,6 +93,7 @@ public class FragmentNewsMenuDetail extends Fragment {
             System.out.println("空了");
         }
         getDataFromServer();
+
     }
 
     @Nullable
@@ -116,6 +124,8 @@ public class FragmentNewsMenuDetail extends Fragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         swipeRefreshLayout.setProgressBackgroundColorSchemeResource(android.R.color.white);
 
+        arrayNewsList = newsTabBean.data.news;
+
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -137,6 +147,39 @@ public class FragmentNewsMenuDetail extends Fragment {
                 },3000);
             }
         });
+
+        recyclerView.addOnItemTouchListener(new OnItemTouchListener(getContext(),recyclerView,new OnItemTouchListener.OnItemClickListener(){
+
+            @Override
+            public void onItemClick(View view, int position) {
+
+                System.out.println("短按"+position);
+                NewsTabBean.NewsData newsData=arrayNewsList.get(position-1);
+
+                String readIds = PrefUtils.getString(getActivity(),"read_ids","");
+                if (!readIds.contains(newsData.id+"")){
+                    readIds = readIds+newsData.id + ",";
+                    PrefUtils.setString(getActivity(),"read_ids",readIds);
+                    TextView textView=view.findViewById(R.id.tv_title);
+                    textView.setTextColor(Color.GRAY);
+                }
+
+                Intent intent = new Intent(getActivity(), NewsDetailActivity.class);
+                startActivity(intent);
+
+
+            }
+
+            @Override
+            public void onLongItemClick(View view, int position) {
+                System.out.println("长按"+position);
+            }
+        }));
+
+
+
+
+
     }
 
     @Override
@@ -299,6 +342,15 @@ public class FragmentNewsMenuDetail extends Fragment {
                 NewsHolder newsHolder = (NewsHolder)viewHolder;
                 myBitmapUtils.display(newsHolder.imageView,newsData.listimage);
                 newsHolder.textView.setText(newsData.title);
+
+                String readIds = PrefUtils.getString(view.getContext(),"read_ids","");
+                if (readIds.contains(newsData.id+"")){
+                    newsHolder.textView.setTextColor(Color.GRAY);
+                }else{
+                    newsHolder.textView.setTextColor(Color.BLACK);
+                }
+
+
                 newsHolder.tv_data.setText(newsData.pubdate);
             }
 
@@ -367,6 +419,8 @@ public class FragmentNewsMenuDetail extends Fragment {
 
 
     }
+
+
 
 
 
