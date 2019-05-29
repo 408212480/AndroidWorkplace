@@ -51,10 +51,15 @@ public class FragmentNews extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         view = inflater.inflate(R.layout.fragment_content2,container,false);
+        return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
         Bundle bundle = getArguments();
         newsMenuDataArrayList = (NewsMenu.NewsMenuData) bundle.getSerializable("news_menu");
         initView();
-        return view;
     }
 
     public void initView(){

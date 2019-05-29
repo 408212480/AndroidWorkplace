@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
 
     private static List<Fragment> mFragmentHashMap=new ArrayList<>();
 
-    private static final List<String> classifiedNesTitleString= Arrays.asList("首页","新闻","政务","服务","设置");
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

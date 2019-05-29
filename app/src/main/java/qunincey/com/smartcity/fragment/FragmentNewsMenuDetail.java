@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -88,6 +89,7 @@ public class FragmentNewsMenuDetail extends Fragment {
             String cache= CacheUtils.getCache(menu.getUrl(),getActivity());
             if (cache!=null){
                 newsTabBean=processNewsData(cache);
+                System.out.println(menu.getTitle());
             }
         }else {
             System.out.println("空了");
@@ -165,6 +167,7 @@ public class FragmentNewsMenuDetail extends Fragment {
                 }
 
                 Intent intent = new Intent(getActivity(), NewsDetailActivity.class);
+                intent.putExtra("url",newsData.url);
                 startActivity(intent);
 
 
@@ -275,8 +278,6 @@ public class FragmentNewsMenuDetail extends Fragment {
         public static final int TYPE_HEADER = 0;  //说明是带有Header的
         public static final int TYPE_FOOTER = 1;  //说明是带有Footer的
         public static final int TYPE_NORMAL = 2;  //说明是不带有header和footer的
-        private int mHeaderCount=1;//头部View个数
-        private int mBottomCount=1;//底部View个数
 
         public View headerView;
         public View footView;
@@ -357,6 +358,44 @@ public class FragmentNewsMenuDetail extends Fragment {
             linearLayoutManager.getChildCount();
             linearLayoutManager.getItemCount();
             linearLayoutManager.findLastVisibleItemPosition();
+
+
+            if(handler!=null){
+                handler=new Handler(){
+                    @Override
+                    public void handleMessage(Message msg) {
+                        int currentItem=viewPager.getCurrentItem();
+                        currentItem ++;
+
+                        if (currentItem > newsTabBean.getData().topnews.size()-1){
+                            currentItem = 0;
+                        }
+                        viewPager.setCurrentItem(currentItem);
+
+                        handler.sendEmptyMessageDelayed(0,3000);
+                    }
+                };
+                handler.sendEmptyMessageDelayed(0,3000);
+
+                viewPager.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        switch (event.getAction()){
+                            case MotionEvent.ACTION_DOWN:
+                                handler.removeCallbacksAndMessages(null);
+                                break;
+                            case MotionEvent.ACTION_UP:
+                                handler.sendEmptyMessageDelayed(0,3000);
+                                break;
+
+                                default:break;
+
+
+                        }
+                        return false;
+                    }
+                });
+            }
 
 
 

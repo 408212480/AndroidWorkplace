@@ -3,11 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+
        >
 
         <android.support.v7.widget.Toolbar
@@ -16,13 +18,11 @@
             android:layout_height="match_parent"
             android:background="@android:color/holo_red_dark"
             android:elevation="4dp"
-            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-
+            app:layout_scrollFlags="scroll"
             >
 
             <ImageButton
-                android:id="@+id/btn_menu"
+                android:id="@+id/btn_back"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/holo_red_dark"
@@ -30,48 +30,25 @@
 
                 />
 
+
         </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>
 
-    <!-- 获取网站的标题-->
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
+    <ProgressBar
+        android:id="@+id/pb_webview"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text=""/>
+        android:layout_centerVertical="true"
+        >
+    </ProgressBar>
 
-    <!--开始加载提示-->
-    <TextView
-        android:id="@+id/text_beginLoading"
-        android:layout_below="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""/>
-
-    <!--获取加载进度-->
-    <TextView
-        android:layout_below="@+id/text_beginLoading"
-        android:id="@+id/text_Loading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""/>
-
-    <!--结束加载提示-->
-    <TextView
-        android:layout_below="@+id/text_Loading"
-        android:id="@+id/text_endLoading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""/>
-
-    <!--显示网页区域-->
     <WebView
         android:id="@+id/webView1"
-        android:layout_below="@+id/text_endLoading"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_marginTop="10dp" />
+         />
 
 
 
