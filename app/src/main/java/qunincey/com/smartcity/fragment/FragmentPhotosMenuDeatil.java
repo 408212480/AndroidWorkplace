@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ import qunincey.com.smartcity.domain.PhotosBean;
 import qunincey.com.smartcity.global.GlobalConstants;
 import qunincey.com.smartcity.utils.CacheUtils;
 import qunincey.com.smartcity.utils.MyBitmapUtils;
+import qunincey.com.smartcity.utils.MyPicassoUtils;
 import qunincey.com.smartcity.utils.OkhttpUtils;
 import qunincey.com.smartcity.view.TopNewsViewPager;
 
@@ -132,6 +134,7 @@ public class FragmentPhotosMenuDeatil extends Fragment {
     class PhotoAdapter extends BaseAdapter{
 
         private MyBitmapUtils myBitmapUtils;
+        private MyPicassoUtils myPicassoUtils;
 
         public PhotoAdapter(){
             myBitmapUtils=new MyBitmapUtils();
@@ -169,8 +172,8 @@ public class FragmentPhotosMenuDeatil extends Fragment {
             PhotosBean.PhotoNews item= (PhotosBean.PhotoNews) getItem(position);
 
             holder.tvTitle.setText(item.title);
-            myBitmapUtils.display(holder.ivPic,item.listimage);
-
+            myPicassoUtils = new MyPicassoUtils();
+            myPicassoUtils.load(item.listimage,holder.ivPic);
             return convertView;
         }
     }

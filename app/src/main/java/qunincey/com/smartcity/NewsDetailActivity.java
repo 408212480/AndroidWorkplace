@@ -22,14 +22,22 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.tencent.connect.share.QQShare;
+import com.tencent.tauth.IUiListener;
+import com.tencent.tauth.Tencent;
+import com.tencent.tauth.UiError;
+
 import qunincey.com.smartcity.utils.MyWebChromeClient;
 import qunincey.com.smartcity.utils.PrefUtils;
+
+import static android.provider.UserDictionary.Words.APP_ID;
 
 public class NewsDetailActivity extends AppCompatActivity {
 
     private ProgressBar progressBar;
     private String mUrl;
     private WebSettings settings;
+    private Tencent mTencent;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -100,6 +108,8 @@ public class NewsDetailActivity extends AppCompatActivity {
 
         });
 
+        mTencent = Tencent.createInstance("101584630", this.getApplicationContext());
+
 
     }
 
@@ -114,6 +124,13 @@ public class NewsDetailActivity extends AppCompatActivity {
                     showChooseDialog();
                     break;
                 case R.id.action_share:
+                    final Bundle params = new Bundle();
+                    params.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_DEFAULT);
+                    params.putString(QQShare.SHARE_TO_QQ_TITLE,"震惊，舍友竟然还在打游戏");
+                    params.putString(QQShare.SHARE_TO_QQ_SUMMARY,  "没什么好分享的");
+                    params.putString(QQShare.SHARE_TO_QQ_TARGET_URL,  mUrl);
+                    params.putString(QQShare.SHARE_TO_QQ_APP_NAME,  "智慧北京"+"101584630");
+                    mTencent.shareToQQ(NewsDetailActivity.this,params,qqShareListener);
                     break;
             }
             return true;
@@ -178,6 +195,20 @@ public class NewsDetailActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
+
+    IUiListener qqShareListener = new IUiListener() {
+        @Override
+        public void onCancel() {
+        }
+        @Override
+        public void onComplete(Object response) {
+
+        }
+        @Override
+        public void onError(UiError e) {
+
+        }
+    };
 
 
 }

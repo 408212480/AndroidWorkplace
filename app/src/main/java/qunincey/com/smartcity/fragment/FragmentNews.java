@@ -28,9 +28,13 @@ import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import qunincey.com.smartcity.MainActivity;
 import qunincey.com.smartcity.R;
 import qunincey.com.smartcity.domain.FragmentInfo;
 import qunincey.com.smartcity.domain.NewsMenu;
+import qunincey.com.smartcity.global.GlobalConstants;
+import qunincey.com.smartcity.utils.CacheUtils;
+import qunincey.com.smartcity.utils.ProcessDataUtils;
 import qunincey.com.smartcity.view.TopNewsViewPager;
 
 public class FragmentNews extends Fragment {
@@ -43,8 +47,22 @@ public class FragmentNews extends Fragment {
     private List<FragmentNewsMenuDetail> mFragments;
     private TabLayout tabLayout;
     private TopNewsViewPager viewPager;
+    private ArrayList<NewsMenu.NewsTabData> newsTabData;
 
-
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        /*
+        * 当创建的时候就去找缓存
+        * */
+        String cache= CacheUtils.getCache(GlobalConstants.CATEGORY_URL, getActivity());
+        if (cache!=null){
+            /*
+            * newsMenu.data.get(0)
+            * */
+            newsTabData=ProcessDataUtils.processDataByNewsMenu(cache,getActivity()).data.get(0).children;
+        }
+    }
 
     @Nullable
     @Override
@@ -55,12 +73,19 @@ public class FragmentNews extends Fragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        Bundle bundle = getArguments();
-        newsMenuDataArrayList = (NewsMenu.NewsMenuData) bundle.getSerializable("news_menu");
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         initView();
+        imageButton = view.findViewById(R.id.btn_menu);
+        drawerLayout = getActivity().findViewById(R.id.dl_content);
+        imageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
     }
+
 
     public void initView(){
 
@@ -69,18 +94,17 @@ public class FragmentNews extends Fragment {
         mFragments = new ArrayList<>();
 
 
-        for (int i=0;i<newsMenuDataArrayList.children.size();i++){
+        for (int i=0;i<newsTabData.size();i++){
             FragmentNewsMenuDetail fragmentInfo=new FragmentNewsMenuDetail();
             Bundle bundle1 =new Bundle();
             /*
             * 放id
             * */
-            bundle1.putInt("id",newsMenuDataArrayList.getChildren().get(i).getId());
-            bundle1.putSerializable(newsMenuDataArrayList.getChildren().get(i).getId()+"",newsMenuDataArrayList.getChildren().get(i));
+            bundle1.putInt("id",newsTabData.get(i).getId());
+            bundle1.putSerializable(newsTabData.get(i).getId()+"",newsTabData.get(i));
             fragmentInfo.setArguments(bundle1);
-            System.out.println(newsMenuDataArrayList.getChildren().get(i).toString());
             mFragments.add(fragmentInfo);
-            tabLayout.addTab(tabLayout.newTab().setText(newsMenuDataArrayList.children.get(i).title));
+            tabLayout.addTab(tabLayout.newTab().setText(newsTabData.get(i).title));
         }
         PagerAdapter adapter = new
                 ViewPagerAdapter(getChildFragmentManager());
@@ -107,18 +131,7 @@ public class FragmentNews extends Fragment {
         });
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        imageButton = view.findViewById(R.id.btn_menu);
-        drawerLayout = getActivity().findViewById(R.id.dl_content);
-        imageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                drawerLayout.openDrawer(GravityCompat.START);
-            }
-        });
-    }
+
 
 
     public class ViewPagerAdapter extends FragmentPagerAdapter {

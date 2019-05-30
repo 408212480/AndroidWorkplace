@@ -173,15 +173,14 @@ public class MainActivity extends AppCompatActivity {
         * bundle传参
         *
         * */
-        Bundle bundle=new Bundle();
-        String cache= CacheUtils.getCache(GlobalConstants.CATEGORY_URL,MainActivity.this);
+//        Bundle bundle=new Bundle();
+     /*   String cache= CacheUtils.getCache(GlobalConstants.CATEGORY_URL,MainActivity.this);
         if (cache!=null){
-            System.out.println("发现缓存啦");
             newsMenu=processData(cache);
             bundle.putSerializable("news_menu",newsMenu.data.get(0));
             fragment2.setArguments(bundle);
         }
-        getDataFromServer();
+        getDataFromServer();*/
         Fragment fragment3=new FragmentGov();
         Fragment fragment4=new FragmentSmart();
         Fragment fragment5=new FragmentSetting();

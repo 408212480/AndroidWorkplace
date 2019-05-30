@@ -21,6 +21,7 @@ import qunincey.com.smartcity.global.GlobalConstants;
 import qunincey.com.smartcity.utils.CacheUtils;
 import qunincey.com.smartcity.utils.OkhttpUtils;
 import qunincey.com.smartcity.utils.PrefUtils;
+import qunincey.com.smartcity.utils.ProcessDataUtils;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -30,6 +31,9 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
+        OkhttpUtils.getNewsMenu();
+
         rlRoot = (ConstraintLayout) findViewById(R.id.rl_root);
         /*属性动画--旋转*/
         ObjectAnimator animator=ObjectAnimator.ofFloat(rlRoot,"rotation",0f,360f);
@@ -83,5 +87,30 @@ public class SplashActivity extends AppCompatActivity {
         });
     }
 
+    public void getDataFromServer() {
 
+        /*
+         * 主线程不能开网络请求  会阻塞  用异步的
+         *
+         * */
+        OkhttpUtils.sendRequestWithOkhttp(GlobalConstants.SERVER_URL + "/categories.json", new Callback() {
+
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Toast.makeText(SplashActivity.this, "网络不通畅", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String responseStr = response.body().string();
+                    ProcessDataUtils.processDataByNewsMenu(responseStr, SplashActivity.this);
+                    System.out.println("闪屏页请求成功");
+                } else {
+//                    Toast.makeText(MainActivity.this,"服务器错误",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+    }
 }

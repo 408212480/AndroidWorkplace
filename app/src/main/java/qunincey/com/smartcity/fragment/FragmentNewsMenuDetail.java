@@ -89,7 +89,6 @@ public class FragmentNewsMenuDetail extends Fragment {
             String cache= CacheUtils.getCache(menu.getUrl(),getActivity());
             if (cache!=null){
                 newsTabBean=processNewsData(cache);
-                System.out.println(menu.getTitle());
             }
         }else {
             System.out.println("空了");
