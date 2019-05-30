@@ -43,6 +43,7 @@ import qunincey.com.smartcity.domain.NewsMenu;
 import qunincey.com.smartcity.fragment.FragmentGov;
 import qunincey.com.smartcity.fragment.FragmentHome;
 import qunincey.com.smartcity.fragment.FragmentNews;
+import qunincey.com.smartcity.fragment.FragmentPhotosMenuDeatil;
 import qunincey.com.smartcity.fragment.FragmentSetting;
 import qunincey.com.smartcity.fragment.FragmentSmart;
 import qunincey.com.smartcity.global.GlobalConstants;
@@ -205,9 +206,9 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 drawerLayout.closeDrawer(Gravity.LEFT);
                 switch (position){
-                    case 1:
+                    case 2:
                         Toast.makeText(MainActivity.this,"item1",Toast.LENGTH_SHORT).show();
-                        Fragment fragment2=new FragmentHome();
+                        Fragment fragment2=new FragmentPhotosMenuDeatil();
                         mFragmentHashMap.set(1,fragment2);
                         viewPager.setAdapter(new PageAdapter(getSupportFragmentManager(),tabLayout.getTabCount()));
                 }
