@@ -68,8 +68,8 @@ public class FragmentPhotosMenuDeatil extends Fragment {
             processData(cache);
         }
 
-        getDataFromServer();
-        processData(cache);
+//        getDataFromServer();
+//        processData(cache);
     }
 
     @Nullable
@@ -88,39 +88,8 @@ public class FragmentPhotosMenuDeatil extends Fragment {
                 drawerLayout.openDrawer(GravityCompat.START);
             }
         });
+        listView.setAdapter(new PhotoAdapter());
         return view;
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-    }
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-
-    }
-
-    private void getDataFromServer() {
-        OkhttpUtils.sendRequestWithOkhttp(GlobalConstants.PHOTOS_URL, new Callback() {
-
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Toast.makeText(getActivity(), "网络不通畅", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    String result = response.body().string();
-                    CacheUtils.setCache(GlobalConstants.PHOTOS_URL,result,getActivity());
-                } else {
-                    System.out.println(GlobalConstants.PHOTOS_URL);
-                }
-            }
-        });
     }
 
     private void processData(String result) {
@@ -128,17 +97,15 @@ public class FragmentPhotosMenuDeatil extends Fragment {
         PhotosBean photosBean=gson.fromJson(result, PhotosBean.class);
 
         mNewsList = photosBean.data.news;
-        listView.setAdapter(new PhotoAdapter());
+
     }
 
     class PhotoAdapter extends BaseAdapter{
 
-        private MyBitmapUtils myBitmapUtils;
         private MyPicassoUtils myPicassoUtils;
 
         public PhotoAdapter(){
-            myBitmapUtils=new MyBitmapUtils();
-
+            myPicassoUtils = new MyPicassoUtils();
         }
 
         @Override
@@ -172,8 +139,7 @@ public class FragmentPhotosMenuDeatil extends Fragment {
             PhotosBean.PhotoNews item= (PhotosBean.PhotoNews) getItem(position);
 
             holder.tvTitle.setText(item.title);
-            myPicassoUtils = new MyPicassoUtils();
-            myPicassoUtils.load(item.listimage,holder.ivPic);
+            myPicassoUtils.load(GlobalConstants.SERVER_URL+item.listimage.substring(25),holder.ivPic);
             return convertView;
         }
     }

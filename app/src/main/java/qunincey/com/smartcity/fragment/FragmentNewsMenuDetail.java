@@ -93,22 +93,6 @@ public class FragmentNewsMenuDetail extends Fragment {
             menu = (NewsMenu.NewsTabData) bundle.getSerializable(bundleInt+"");
         }else {
             getDataFromServer();
-
-//            Handler uiHandler = new Handler() {
-//
-//                public void handleMessage(Message msg) {
-//                    switch (msg.what) {
-//                        case 1:
-//                            System.out.println("获取成功");
-//
-//                            break;
-//
-//                    }
-//
-//                }
-//
-//                ;
-//            };
         }
 
 
@@ -177,8 +161,6 @@ public class FragmentNewsMenuDetail extends Fragment {
 
             @Override
             public void onItemClick(View view, int position) {
-
-                System.out.println("短按"+position);
                 NewsTabBean.NewsData newsData=arrayNewsList.get(position-1);
 
                 String readIds = PrefUtils.getString(getActivity(),"read_ids","");
@@ -352,7 +334,7 @@ public class FragmentNewsMenuDetail extends Fragment {
             }else {
                 NewsTabBean.NewsData newsData=dataArrayList.get(i);
                 NewsHolder newsHolder = (NewsHolder)viewHolder;
-                picassoUtils.load(newsData.listimage,newsHolder.imageView);
+                picassoUtils.load(GlobalConstants.SERVER_URL+newsData.listimage.substring(25),newsHolder.imageView);
 
                 newsHolder.textView.setText(newsData.title);
 

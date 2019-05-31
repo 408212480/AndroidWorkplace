@@ -174,19 +174,6 @@ public class MainActivity extends AppCompatActivity {
     private void initView() {
         Fragment fragment1=new FragmentHome();
         Fragment fragment2=new FragmentNews();
-
-        /*
-        * bundle传参
-        *
-        * */
-//        Bundle bundle=new Bundle();
-     /*   String cache= CacheUtils.getCache(GlobalConstants.CATEGORY_URL,MainActivity.this);
-        if (cache!=null){
-            newsMenu=processData(cache);
-            bundle.putSerializable("news_menu",newsMenu.data.get(0));
-            fragment2.setArguments(bundle);
-        }
-        getDataFromServer();*/
         Fragment fragment3=new FragmentGov();
         Fragment fragment4=new FragmentSmart();
         Fragment fragment5=new FragmentSetting();
@@ -198,9 +185,6 @@ public class MainActivity extends AppCompatActivity {
         mFragmentHashMap.add(4,fragment5);
 
         Log.i("i","填充成功");
-
-
-
     }
 
     private void listinit(NewsMenu newsMenu) {
@@ -211,11 +195,17 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 drawerLayout.closeDrawer(Gravity.LEFT);
                 switch (position){
+                    case 0:
+                        Fragment fragment22=new FragmentNews();
+                        mFragmentHashMap.set(1,fragment22);
+                        viewPager.setAdapter(new PageAdapter(getSupportFragmentManager(),tabLayout.getTabCount()));
+                        break;
                     case 2:
                         Toast.makeText(MainActivity.this,"item1",Toast.LENGTH_SHORT).show();
                         Fragment fragment2=new FragmentPhotosMenuDeatil();
                         mFragmentHashMap.set(1,fragment2);
                         viewPager.setAdapter(new PageAdapter(getSupportFragmentManager(),tabLayout.getTabCount()));
+                        break;
                 }
 
             }

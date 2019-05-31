@@ -73,13 +73,14 @@ public class FragmentNews extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         view = inflater.inflate(R.layout.fragment_content2,container,false);
+        initView();
         return view;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        initView();
+
         imageButton = view.findViewById(R.id.btn_menu);
         drawerLayout = getActivity().findViewById(R.id.dl_content);
         imageButton.setOnClickListener(new View.OnClickListener() {
