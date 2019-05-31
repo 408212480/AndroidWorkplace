@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
 
         drawerLayout = findViewById(R.id.dl_content);
 
-        initView();
+
         tabLayout =  findViewById(R.id.tabLayout);
 
         viewPager.setAdapter(new PageAdapter(getSupportFragmentManager(),tabLayout.getTabCount()));
@@ -163,6 +163,12 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        initView();
     }
 
     private void initView() {

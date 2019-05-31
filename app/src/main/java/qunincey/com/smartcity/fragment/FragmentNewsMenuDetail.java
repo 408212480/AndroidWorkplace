@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -49,6 +50,7 @@ import qunincey.com.smartcity.domain.NewsTabBean;
 import qunincey.com.smartcity.global.GlobalConstants;
 import qunincey.com.smartcity.utils.CacheUtils;
 import qunincey.com.smartcity.utils.MyBitmapUtils;
+import qunincey.com.smartcity.utils.MyPicassoUtils;
 import qunincey.com.smartcity.utils.OkhttpUtils;
 import qunincey.com.smartcity.utils.OnItemTouchListener;
 import qunincey.com.smartcity.utils.PrefUtils;
@@ -73,27 +75,44 @@ public class FragmentNewsMenuDetail extends Fragment {
     private TextView textView;
     private CirclePageIndicator circleIndicator;
     private RecyclerView recyclerView;
-    private MyBitmapUtils myBitmapUtils;
     private SwipeRefreshLayout swipeRefreshLayout;
     private LinearLayoutManager linearLayoutManager;
     private Handler handler;
     private ArrayList<NewsTabBean.NewsData> arrayNewsList;
+    private MyPicassoUtils picassoUtils;
+    private Handler handler1;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        handler1 = new Handler(Looper.getMainLooper());
         bundle = getArguments();
-        bundleInt = bundle.getInt("id");
-        menu = (NewsMenu.NewsTabData) bundle.getSerializable(bundleInt+"");
-        if (menu !=null){
-            String cache= CacheUtils.getCache(menu.getUrl(),getActivity());
-            if (cache!=null){
-                newsTabBean=processNewsData(cache);
-            }
+        if(bundle !=null && bundle.containsKey("id")){
+            bundleInt = bundle.getInt("id");
+            System.out.println("传进来的id"+bundleInt);
+            menu = (NewsMenu.NewsTabData) bundle.getSerializable(bundleInt+"");
         }else {
-            System.out.println("空了");
+            getDataFromServer();
+
+//            Handler uiHandler = new Handler() {
+//
+//                public void handleMessage(Message msg) {
+//                    switch (msg.what) {
+//                        case 1:
+//                            System.out.println("获取成功");
+//
+//                            break;
+//
+//                    }
+//
+//                }
+//
+//                ;
+//            };
         }
-        getDataFromServer();
+
+
+
 
     }
 
@@ -101,16 +120,21 @@ public class FragmentNewsMenuDetail extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_menu_detail,container,false);
+        intiView();
+        initImageData();
         return view;
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
 
-        handler = new Handler();
-        myBitmapUtils = new MyBitmapUtils();
+    private void intiView() {
+        if (menu !=null){
+            String cache= CacheUtils.getCache(menu.getUrl(),getActivity());
+            if (cache!=null){
+                newsTabBean=processNewsData(cache);
+            }
+        }
 
+        picassoUtils = new MyPicassoUtils();
         recyclerView = view.findViewById(R.id.rv_list);
         /*
          * 指定布局方式  recycview有多种布局方式
@@ -177,17 +201,6 @@ public class FragmentNewsMenuDetail extends Fragment {
                 System.out.println("长按"+position);
             }
         }));
-
-
-
-
-
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        initImageData();
     }
 
     /*初始化view*/
@@ -199,7 +212,7 @@ public class FragmentNewsMenuDetail extends Fragment {
             ImageView view=new ImageView(getActivity());
             view.setScaleType(ImageView.ScaleType.FIT_XY);
             /*维护view*/
-            myBitmapUtils.display(view,newsTabBean.getData().getTopnews().get(i).topimage);
+            picassoUtils.load(newsTabBean.getData().getTopnews().get(i).topimage,view);
             imageViewsList.add(view);
         }
 
@@ -227,7 +240,6 @@ public class FragmentNewsMenuDetail extends Fragment {
                     String responseStr = response.body().string();
                     newsTabBean = processNewsData(responseStr);
                     CacheUtils.setCache(menu.getUrl(),responseStr,getActivity());
-                    System.out.println(GlobalConstants.SERVER_URL+menu.getUrl()+"缓存成功");
                 } else {
                     System.out.println(GlobalConstants.SERVER_URL+menu.getUrl());
                 }
@@ -340,7 +352,8 @@ public class FragmentNewsMenuDetail extends Fragment {
             }else {
                 NewsTabBean.NewsData newsData=dataArrayList.get(i);
                 NewsHolder newsHolder = (NewsHolder)viewHolder;
-                myBitmapUtils.display(newsHolder.imageView,newsData.listimage);
+                picassoUtils.load(newsData.listimage,newsHolder.imageView);
+
                 newsHolder.textView.setText(newsData.title);
 
                 String readIds = PrefUtils.getString(view.getContext(),"read_ids","");
@@ -349,8 +362,6 @@ public class FragmentNewsMenuDetail extends Fragment {
                 }else{
                     newsHolder.textView.setTextColor(Color.BLACK);
                 }
-
-
                 newsHolder.tv_data.setText(newsData.pubdate);
             }
 

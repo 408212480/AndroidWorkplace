@@ -32,7 +32,7 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        OkhttpUtils.getNewsMenu();
+        getDataFromServer();
 
         rlRoot = (ConstraintLayout) findViewById(R.id.rl_root);
         /*属性动画--旋转*/

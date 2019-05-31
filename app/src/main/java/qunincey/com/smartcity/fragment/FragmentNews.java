@@ -20,11 +20,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -34,6 +37,7 @@ import qunincey.com.smartcity.domain.FragmentInfo;
 import qunincey.com.smartcity.domain.NewsMenu;
 import qunincey.com.smartcity.global.GlobalConstants;
 import qunincey.com.smartcity.utils.CacheUtils;
+import qunincey.com.smartcity.utils.OkhttpUtils;
 import qunincey.com.smartcity.utils.ProcessDataUtils;
 import qunincey.com.smartcity.view.TopNewsViewPager;
 
@@ -104,6 +108,7 @@ public class FragmentNews extends Fragment {
             bundle1.putSerializable(newsTabData.get(i).getId()+"",newsTabData.get(i));
             fragmentInfo.setArguments(bundle1);
             mFragments.add(fragmentInfo);
+            getFromServer(newsTabData.get(i).getUrl());
             tabLayout.addTab(tabLayout.newTab().setText(newsTabData.get(i).title));
         }
         PagerAdapter adapter = new
@@ -131,7 +136,28 @@ public class FragmentNews extends Fragment {
         });
     }
 
+    private void getFromServer(final String url) {
 
+        OkhttpUtils.sendRequestWithOkhttp(GlobalConstants.SERVER_URL+url, new Callback() {
+
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Toast.makeText(getActivity(), "网络不通畅", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+
+                    String responseStr = response.body().string();
+                    CacheUtils.setCache(url,responseStr,getActivity());
+                    System.out.println("请求获取成功");
+                } else {
+
+                }
+            }
+        });
+    }
 
 
     public class ViewPagerAdapter extends FragmentPagerAdapter {
