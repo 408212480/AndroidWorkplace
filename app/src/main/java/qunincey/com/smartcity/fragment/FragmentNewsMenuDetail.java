@@ -193,8 +193,8 @@ public class FragmentNewsMenuDetail extends Fragment {
         for (int i=0;i<newsTabBean.data.topnews.size();i++){
             ImageView view=new ImageView(getActivity());
             view.setScaleType(ImageView.ScaleType.FIT_XY);
-            /*维护view*/
-            picassoUtils.load(newsTabBean.getData().getTopnews().get(i).topimage,view);
+            /*维护view  GlobalConstants.SERVER_URL+newsData.listimage.substring(25)*/
+            picassoUtils.load(GlobalConstants.SERVER_URL+newsTabBean.getData().getTopnews().get(i).topimage.substring(25),view);
             imageViewsList.add(view);
         }
 

@@ -149,7 +149,6 @@ public class FragmentNews extends Fragment {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
-
                     String responseStr = response.body().string();
                     CacheUtils.setCache(url,responseStr,getActivity());
                     System.out.println("请求获取成功");

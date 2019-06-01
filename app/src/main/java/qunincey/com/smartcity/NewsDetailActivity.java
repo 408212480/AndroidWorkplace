@@ -27,6 +27,7 @@ import com.tencent.tauth.IUiListener;
 import com.tencent.tauth.Tencent;
 import com.tencent.tauth.UiError;
 
+import qunincey.com.smartcity.global.GlobalConstants;
 import qunincey.com.smartcity.utils.MyWebChromeClient;
 import qunincey.com.smartcity.utils.PrefUtils;
 
@@ -77,7 +78,7 @@ public class NewsDetailActivity extends AppCompatActivity {
 
         mUrl = getIntent().getStringExtra("url");
 
-        webView.loadUrl(mUrl);
+        webView.loadUrl(GlobalConstants.SERVER_URL+mUrl.substring(25));
         webView.setWebChromeClient(new MyWebChromeClient(progressBar));
         webView.setWebViewClient( new WebViewClient(){
 
