@@ -174,8 +174,8 @@ public class MainActivity extends AppCompatActivity {
     private void initView() {
         Fragment fragment1=new FragmentHome();
         Fragment fragment2=new FragmentNews();
-        Fragment fragment3=new FragmentGov();
-        Fragment fragment4=new FragmentSmart();
+        Fragment fragment3=new FragmentSmart();
+        Fragment fragment4=new FragmentGov();
         Fragment fragment5=new FragmentSetting();
 
         mFragmentHashMap.add(0,fragment1);
