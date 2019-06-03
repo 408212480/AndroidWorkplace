@@ -45,6 +45,7 @@ import qunincey.com.smartcity.utils.CacheUtils;
 import qunincey.com.smartcity.utils.MyBitmapUtils;
 import qunincey.com.smartcity.utils.MyPicassoUtils;
 import qunincey.com.smartcity.utils.OkhttpUtils;
+import qunincey.com.smartcity.utils.PrefUtils;
 import qunincey.com.smartcity.view.TopNewsViewPager;
 
 public class FragmentPhotosMenuDeatil extends Fragment {
@@ -64,6 +65,8 @@ public class FragmentPhotosMenuDeatil extends Fragment {
 
     public static final int UPDATE_TEXT = 1;
 
+    public static  int isListView = 1 ;
+
     Handler handler = new Handler(){
 
         @Override
@@ -79,6 +82,7 @@ public class FragmentPhotosMenuDeatil extends Fragment {
             }
         }
     };
+    private ImageButton bt_photo;
 
     @Nullable
     @Override
@@ -153,6 +157,8 @@ public class FragmentPhotosMenuDeatil extends Fragment {
 
         imageButton = view.findViewById(R.id.btn_menu);
         drawerLayout = getActivity().findViewById(R.id.dl_content);
+
+        bt_photo = view.findViewById(R.id.btn_photo);
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -160,7 +166,30 @@ public class FragmentPhotosMenuDeatil extends Fragment {
             }
         });
         listView.setAdapter(new PhotoAdapter());
+        gridView.setAdapter(new PhotoAdapter());
+
+        bt_photo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println();
+                isListView=PrefUtils.getInt(getContext(),"isListView",1);
+                if (isListView==2){
+                    listView.setVisibility(View.VISIBLE);
+                    gridView.setVisibility(View.INVISIBLE);
+                    bt_photo.setImageResource(R.drawable.icon_pic_grid_type);
+                    PrefUtils.setInt(getContext(),"isListView",1);
+                }else if (isListView==1){
+                    listView.setVisibility(View.INVISIBLE);
+                    gridView.setVisibility(View.VISIBLE);
+                    bt_photo.setImageResource(R.drawable.icon_pic_list_type);
+                    PrefUtils.setInt(getContext(),"isListView",2);
+                }
+
+            }
+        });
     }
+
+
 
 
     public void getDataFormServer(){
