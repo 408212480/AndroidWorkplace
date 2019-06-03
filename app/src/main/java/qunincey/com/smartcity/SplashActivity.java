@@ -116,23 +116,5 @@ public class SplashActivity extends AppCompatActivity {
             }
         });
 
-        OkhttpUtils.sendRequestWithOkhttp(GlobalConstants.PHOTOS_URL, new Callback() {
-
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Toast.makeText(SplashActivity.this, "网络不通畅", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    String result = response.body().string();
-                    CacheUtils.setCache(GlobalConstants.PHOTOS_URL,result,SplashActivity.this);
-                } else {
-//                    Toast.makeText(MainActivity.this,"服务器错误",Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
     }
 }

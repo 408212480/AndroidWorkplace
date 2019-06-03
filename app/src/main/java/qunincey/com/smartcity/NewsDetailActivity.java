@@ -72,7 +72,7 @@ public class NewsDetailActivity extends AppCompatActivity {
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                NewsDetailActivity.this.finish();
+                finish();
             }
         });
 
@@ -103,9 +103,12 @@ public class NewsDetailActivity extends AppCompatActivity {
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                view.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
                 view.loadUrl(url);
                 return super.shouldOverrideUrlLoading(view, url);
             }
+
+
 
 
         });
@@ -119,9 +122,6 @@ public class NewsDetailActivity extends AppCompatActivity {
         @Override
         public boolean onMenuItemClick(MenuItem menuItem) {
             switch (menuItem.getItemId()) {
-                case R.id.btn_back:
-                    System.out.println("被点击了");
-                    finish();
                 case R.id.action_edit:
                     showChooseDialog();
                     break;
