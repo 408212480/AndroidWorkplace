@@ -77,6 +77,7 @@ public class NewsDetailActivity extends AppCompatActivity {
         });
 
         mUrl = getIntent().getStringExtra("url");
+        System.out.println(GlobalConstants.SERVER_URL+mUrl.substring(25));
 
         webView.loadUrl(GlobalConstants.SERVER_URL+mUrl.substring(25));
         webView.setWebChromeClient(new MyWebChromeClient(progressBar));
